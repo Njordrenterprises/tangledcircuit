@@ -11,7 +11,7 @@ const AccessButton = ({ id, isActive, onClick }: { id: number; isActive: boolean
   </button>
 );
 
-export default function AccessSystem() {
+export default function AccessSystem({ onUnlock }: { onUnlock: () => void }) {
   const [activeButtons, setActiveButtons] = useState<number[]>([]);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [message, setMessage] = useState('SYSTEM LOCKED');
@@ -31,6 +31,7 @@ export default function AccessSystem() {
       if (activeButtons.join(',') === '1,2,3') {
         setIsUnlocked(true);
         setMessage('ACCESS GRANTED');
+        setTimeout(() => onUnlock(), 250); // Start transition sooner
       } else {
         setActiveButtons([]);
         setMessage('INCORRECT SEQUENCE');

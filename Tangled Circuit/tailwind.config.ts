@@ -30,6 +30,12 @@ export default {
       brightness: {
         '115': '1.9',
       },
+      transitionProperty: {
+        'opacity': 'opacity',
+      },
+      transitionDuration: {
+        '1000': '1000ms',
+      },
     },
   },
 } satisfies Config;

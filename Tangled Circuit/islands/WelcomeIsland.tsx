@@ -1,31 +1,25 @@
 import { useState, useEffect } from "preact/hooks";
+import AccessSystem from "../islands/AccessSystem.tsx";
+import HomeNavigation from "../islands/HomeNavigation.tsx";
 
 export default function WelcomeIsland() {
-  const [clickedIndex, setClickedIndex] = useState<number>(-1);
-  const [hoverIndex, setHoverIndex] = useState<number>(-1);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   useEffect(() => {
-    const resetClickTimeout = setTimeout(() => {
-      setClickedIndex(-1);
-    }, 500);
-
-    return () => clearTimeout(resetClickTimeout);
-  }, [clickedIndex]);
+    if (isUnlocking) {
+      setTimeout(() => setIsUnlocked(true), 1000);
+    }
+  }, [isUnlocking]);
 
   return (
-    <div class="card-container">
-      {['page-1', 'page-2', 'page-3', 'page-4'].map((page, index) => (
-        <a
-          href={`/${page}`}
-          key={index}
-          class={`card card-${index + 1} ${clickedIndex === index ? 'clicked' : ''} ${hoverIndex === index ? 'hovered' : ''}`}
-          onClick={() => setClickedIndex(index)}
-          onMouseEnter={() => setHoverIndex(index)}
-          onMouseLeave={() => setHoverIndex(-1)}
-        >
-          <div class="card-content">{page}</div>
-        </a>
-      ))}
+    <div class="w-screen h-screen flex justify-center items-center bg-gray-900">
+      <div class={`absolute inset-0 transition-opacity duration-1000 ${isUnlocking ? 'opacity-0' : 'opacity-100'}`}>
+        <AccessSystem onUnlock={() => setIsUnlocking(true)} />
+      </div>
+      <div class={`absolute inset-0 transition-opacity duration-1000 ${isUnlocked ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <HomeNavigation />
+      </div>
     </div>
   );
 }
