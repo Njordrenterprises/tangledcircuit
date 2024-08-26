@@ -7,24 +7,32 @@ export default {
   theme: {
     extend: {
       animation: {
-        'wiggle': 'wiggle 3s ease-in-out infinite',
-        'float': 'float 5s ease-in-out infinite',
-        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'spin-slow': 'spin 8s linear infinite',
-        'shrink-spiral': 'shrinkSpiral 0.5s ease-in-out forwards',
+        'slight-wiggle': 'slight-wiggle 3s ease-in-out infinite',
+        'gentle-float': 'gentle-float 5s ease-in-out infinite',
+        'subtle-pulse': 'subtle-pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'perspective-shift': 'perspective-shift 6s ease-in-out infinite',
+        'shrink-spiral': 'shrinkSpiral 0.625s ease-in-out forwards',
       },
       keyframes: {
-        wiggle: {
-          '0%, 100%': { transform: 'rotate(-3deg)' },
-          '50%': { transform: 'rotate(3deg)' },
+        'slight-wiggle': {
+          '0%, 100%': { transform: 'rotate(-1deg)' },
+          '50%': { transform: 'rotate(1deg)' },
         },
-        float: {
+        'gentle-float': {
           '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
+          '50%': { transform: 'translateY(-5px)' },
         },
-        shrinkSpiral: {
+        'subtle-pulse': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.05)' },
+        },
+        'perspective-shift': {
+          '0%, 100%': { transform: 'perspective(1000px) rotateY(0deg)' },
+          '50%': { transform: 'perspective(1000px) rotateY(5deg)' },
+        },
+        'shrinkSpiral': {
           '0%': { transform: 'scale(1) rotate(0deg)' },
-          '100%': { transform: 'scale(0.5) rotate(360deg)' },
+          '100%': { transform: 'scale(0) rotate(360deg)' },
         },
       },
       brightness: {

@@ -14,10 +14,10 @@ const NavigationSquare = ({ index, onClick }: { index: number; onClick: () => vo
   ][index];
 
   const animationClasses = [
-    "animate-wiggle",
-    "animate-float",
-    "animate-pulse-slow",
-    "animate-spin-slow"
+    "animate-slight-wiggle",
+    "animate-gentle-float",
+    "animate-subtle-pulse",
+    "animate-perspective-shift"
   ][index];
 
   const handleClick = () => {

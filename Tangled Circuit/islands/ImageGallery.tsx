@@ -1,59 +1,111 @@
 import { useState, useEffect, useRef } from "preact/hooks";
 
 interface Image {
+  key: string;
   src: string;
   alt: string;
+  animation: string;
 }
 
-export default function ImageGallery({ onNavigateBack }: { onNavigateBack: () => void }) {
-  const [images, setImages] = useState<Image[]>([]);
-  const [page, setPage] = useState(1);
-  const loader = useRef(null);
+const animations = [
+  'animate-wiggle',
+  'animate-float',
+  'animate-pulse-slow',
+  'animate-spin-slow',
+];
 
-  const loadMoreImages = () => {
-    const newImages = Array.from({ length: 6 }, (_, i) => ({
-      src: `https://picsum.photos/400/300?random=${images.length + i + 1}`,
-      alt: `Random image ${images.length + i + 1}`,
-    }));
-    setImages((prevImages) => [...prevImages, ...newImages]);
-    setPage((prevPage) => prevPage + 1);
+const IMAGES_PER_PAGE = 6;
+
+export default function ImageGallery({ onNavigateBack, shouldLoad: initialShouldLoad }: { onNavigateBack: () => void, shouldLoad: boolean }) {
+  const [images, setImages] = useState<Image[]>([]);
+  const loader = useRef(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+
+  const loadMoreImages = async () => {
+    try {
+      const response = await fetch('/api/images');
+      if (!response.ok) {
+        throw new Error('Failed to fetch images');
+      }
+      const imageNames: string[] = await response.json();
+      const newImages = Array.from({ length: IMAGES_PER_PAGE }, () => {
+        const randomIndex = Math.floor(Math.random() * imageNames.length);
+        const timestamp = Date.now();
+        const randomNum = Math.floor(Math.random() * 1000);
+        const key = `${timestamp}-${randomNum}`;
+        return {
+          key,
+          src: `/images/${imageNames[randomIndex]}`,
+          alt: `Tech image ${imageNames[randomIndex].split('.')[0]}`,
+          animation: animations[Math.floor(Math.random() * animations.length)],
+        };
+      });
+      setImages((prevImages) => {
+        const uniqueNewImages = newImages.filter(newImg => 
+          !prevImages.some(prevImg => prevImg.key === newImg.key)
+        );
+        return [...prevImages, ...uniqueNewImages];
+      });
+    } catch (error) {
+      console.error('Error loading images:', error);
+    }
+  };
+
+  const handleExit = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      onNavigateBack();
+    }, 500); // Match this with the transition duration in CSS
   };
 
   useEffect(() => {
-    loadMoreImages();
-    const observer = new IntersectionObserver(handleObserver, { threshold: 1 });
-    if (loader.current) {
-      observer.observe(loader.current);
+    if (shouldLoad) {
+      const observer = new IntersectionObserver(handleObserver, { threshold: 1 });
+      if (loader.current) {
+        observer.observe(loader.current);
+      }
+      return () => observer.disconnect();
     }
-    return () => observer.disconnect();
-  }, []);
+  }, [shouldLoad]);
 
-  const handleObserver = (entities: IntersectionObserverEntry[]) => {
-    const target = entities[0];
-    if (target.isIntersecting) {
+  useEffect(() => {
+    if (shouldLoad && images.length === 0) {
       loadMoreImages();
     }
-  };
+  }, [shouldLoad]);
 
-  const handleClick = (e: MouseEvent) => {
-    e.preventDefault();
-    requestAnimationFrame(() => {
-      onNavigateBack();
-    });
+  useEffect(() => {
+    setShouldLoad(initialShouldLoad);
+  }, [initialShouldLoad]);
+
+  const handleObserver = async (entities: IntersectionObserverEntry[]) => {
+    const target = entities[0];
+    if (target.isIntersecting) {
+      await loadMoreImages();
+    }
   };
 
   return (
-    <div class="flex flex-wrap justify-center items-center min-h-screen p-2" onClick={handleClick}>
-      {images.map((image, index) => (
-        <div key={index} class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-          <img
-            src={image.src}
-            alt={image.alt}
-            class="w-full h-auto object-cover rounded-lg shadow-md"
-          />
+    <div 
+      class={`fixed inset-0 bg-gray-900 overflow-y-auto transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'}`} 
+      onClick={handleExit}
+    >
+      <div class="min-h-screen p-4">
+        <div class="flex flex-wrap justify-center">
+          {images.map((image) => (
+            <div key={image.key} class={`w-1/3 p-2 ${image.animation}`}>
+              <img
+                src={image.src}
+                alt={image.alt}
+                class="w-full h-auto object-cover rounded-lg shadow-md"
+                style="aspect-ratio: 1/1;"
+              />
+            </div>
+          ))}
         </div>
-      ))}
-      <div ref={loader} class="w-full h-10" />
+        <div ref={loader} class="w-full h-10" />
+      </div>
     </div>
   );
 }

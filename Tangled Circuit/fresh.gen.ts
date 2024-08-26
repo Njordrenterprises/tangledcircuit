@@ -4,6 +4,7 @@
 
 import * as $_404 from './routes/_404.tsx';
 import * as $_app from './routes/_app.tsx';
+import * as $api_images from './routes/api/images.ts';
 import * as $api_joke from './routes/api/joke.ts';
 import * as $greet_name_ from './routes/greet/[name].tsx';
 import * as $home from './routes/home.tsx';
@@ -20,6 +21,7 @@ const manifest = {
   routes: {
     './routes/_404.tsx': $_404,
     './routes/_app.tsx': $_app,
+    './routes/api/images.ts': $api_images,
     './routes/api/joke.ts': $api_joke,
     './routes/greet/[name].tsx': $greet_name_,
     './routes/home.tsx': $home,
