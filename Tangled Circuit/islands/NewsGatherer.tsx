@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "preact/hooks";
-import NewsReader from "./NewsReader.tsx";
 
 interface NewsItem {
   title: string;
@@ -14,7 +13,6 @@ export default function NewsGatherer({ onNavigateBack, shouldLoad: initialShould
   const [news, setNews] = useState<NewsItem[]>([]);
   const [page, setPage] = useState(1);
   const loader = useRef(null);
-  const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
   const [isExiting, setIsExiting] = useState(false);
   const [shouldLoad, setShouldLoad] = useState(false);
 
@@ -89,8 +87,9 @@ export default function NewsGatherer({ onNavigateBack, shouldLoad: initialShould
     }, 500);
   };
 
-  const handleReadMore = (article: NewsItem) => {
-    setSelectedArticle(article);
+  const handleReadMore = (e: MouseEvent, url: string) => {
+    e.stopPropagation();
+    window.open(url, '_blank');
   };
 
   return (
@@ -100,7 +99,7 @@ export default function NewsGatherer({ onNavigateBack, shouldLoad: initialShould
     >
       <div class="min-h-screen p-4 flex flex-col items-center">
         <h1 class="text-3xl font-bold mb-6 text-white">Latest AI News</h1>
-        {console.log("Current news state:", news)} {/* Add this line */}
+        {console.log("Current news state:", news)}
         {news.length === 0 ? (
           <p class="text-white">Loading news...</p>
         ) : (
@@ -109,10 +108,7 @@ export default function NewsGatherer({ onNavigateBack, shouldLoad: initialShould
               <h2 class="text-xl font-semibold mb-2">{item.title}</h2>
               <p class="mb-2">{item.description}</p>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleReadMore(item);
-                }}
+                onClick={(e) => handleReadMore(e, item.url)}
                 class="text-blue-400 hover:underline"
               >
                 Read more
@@ -122,12 +118,6 @@ export default function NewsGatherer({ onNavigateBack, shouldLoad: initialShould
         )}
         <div ref={loader} class="w-full h-10" />
       </div>
-      {selectedArticle && (
-        <NewsReader
-          article={selectedArticle}
-          onClose={() => setSelectedArticle(null)}
-        />
-      )}
     </div>
   );
 }
