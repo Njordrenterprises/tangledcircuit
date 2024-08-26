@@ -56,7 +56,7 @@ export default function ImageGallery({ onNavigateBack, shouldLoad: initialShould
     setIsExiting(true);
     setTimeout(() => {
       onNavigateBack();
-    }, 500); // Match this with the transition duration in CSS
+    }, 500);
   };
 
   useEffect(() => {
@@ -92,14 +92,13 @@ export default function ImageGallery({ onNavigateBack, shouldLoad: initialShould
       onClick={handleExit}
     >
       <div class="min-h-screen p-4">
-        <div class="flex flex-wrap justify-center">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((image) => (
-            <div key={image.key} class={`w-1/3 p-2 ${image.animation}`}>
+            <div key={image.key} class={`aspect-square ${image.animation}`}>
               <img
                 src={image.src}
                 alt={image.alt}
-                class="w-full h-auto object-cover rounded-lg shadow-md"
-                style="aspect-ratio: 1/1;"
+                class="w-full h-full object-cover rounded-lg shadow-md"
               />
             </div>
           ))}

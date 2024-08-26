@@ -25,12 +25,7 @@ export default function WelcomeIsland() {
   };
 
   const handleNavigation = (index: number) => {
-    if (index === 0) {
-      transitionTo('gallery');
-    } else if (index === 1) {
-      transitionTo('news');
-    }
-    // Add more conditions for other squares as needed
+    transitionTo('gallery');
   };
 
   const handleNavigateBack = () => {

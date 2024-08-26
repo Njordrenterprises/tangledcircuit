@@ -1,59 +1,63 @@
 import { useState, useEffect, useRef } from "preact/hooks";
 
-interface NewsItem {
-  title: string;
-  description: string;
-  url: string;
+interface Image {
+  key: string;
+  src: string;
+  alt: string;
+  animation: string;
 }
 
-const API_KEY = '10d0be7630124a1c92ae7a5767803387';
-const ITEMS_PER_PAGE = 10;
+const animations = [
+  'animate-wiggle',
+  'animate-float',
+  'animate-pulse-slow',
+  'animate-spin-slow',
+];
 
-export default function NewsGatherer({ onNavigateBack, shouldLoad: initialShouldLoad }: { onNavigateBack: () => void, shouldLoad: boolean }) {
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [page, setPage] = useState(1);
+const IMAGES_PER_PAGE = 6;
+
+export default function ImageGallery({ onNavigateBack, shouldLoad: initialShouldLoad }: { onNavigateBack: () => void, shouldLoad: boolean }) {
+  const [images, setImages] = useState<Image[]>([]);
   const loader = useRef(null);
-  const [isExiting, setIsExiting] = useState(false);
   const [shouldLoad, setShouldLoad] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
-  const loadMoreNews = async () => {
+  const loadMoreImages = async () => {
     try {
-      const response = await fetch(
-        `https://newsapi.org/v2/everything?q=artificial+intelligence&apiKey=${API_KEY}&page=${page}&pageSize=${ITEMS_PER_PAGE}`
-      );
-      const data = await response.json();
-      console.log("Fetched news data:", data);
-
+      const response = await fetch('/api/images');
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error('Failed to fetch images');
       }
-
-      if (!data.articles || data.articles.length === 0) {
-        console.warn("No articles found in the API response");
-        return;
-      }
-
-      const newNews = data.articles.map((article: NewsItem) => ({
-        title: article.title || "No title",
-        description: article.description || "No description",
-        url: article.url || "#",
-      }));
-      setNews((prevNews) => [...prevNews, ...newNews]);
-      setPage((prevPage) => prevPage + 1);
+      const imageNames: string[] = await response.json();
+      const newImages = Array.from({ length: IMAGES_PER_PAGE }, () => {
+        const randomIndex = Math.floor(Math.random() * imageNames.length);
+        const timestamp = Date.now();
+        const randomNum = Math.floor(Math.random() * 1000);
+        const key = `${timestamp}-${randomNum}`;
+        return {
+          key,
+          src: `/images/${imageNames[randomIndex]}`,
+          alt: `Tech image ${imageNames[randomIndex].split('.')[0]}`,
+          animation: animations[Math.floor(Math.random() * animations.length)],
+        };
+      });
+      setImages((prevImages) => {
+        const uniqueNewImages = newImages.filter(newImg => 
+          !prevImages.some(prevImg => prevImg.key === newImg.key)
+        );
+        return [...prevImages, ...uniqueNewImages];
+      });
     } catch (error) {
-      console.error("Error fetching news:", error);
+      console.error('Error loading images:', error);
     }
   };
 
-  useEffect(() => {
-    if (shouldLoad && news.length === 0) {
-      loadMoreNews();
-    }
-  }, [shouldLoad]);
-
-  useEffect(() => {
-    setShouldLoad(initialShouldLoad);
-  }, [initialShouldLoad]);
+  const handleExit = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      onNavigateBack();
+    }, 500);
+  };
 
   useEffect(() => {
     if (shouldLoad) {
@@ -66,30 +70,20 @@ export default function NewsGatherer({ onNavigateBack, shouldLoad: initialShould
   }, [shouldLoad]);
 
   useEffect(() => {
-    console.log("NewsGatherer mounted, shouldLoad:", shouldLoad);
-  }, []);
-
-  useEffect(() => {
-    console.log("shouldLoad changed:", shouldLoad);
+    if (shouldLoad && images.length === 0) {
+      loadMoreImages();
+    }
   }, [shouldLoad]);
 
-  const handleObserver = (entities: IntersectionObserverEntry[]) => {
+  useEffect(() => {
+    setShouldLoad(initialShouldLoad);
+  }, [initialShouldLoad]);
+
+  const handleObserver = async (entities: IntersectionObserverEntry[]) => {
     const target = entities[0];
     if (target.isIntersecting) {
-      loadMoreNews();
+      await loadMoreImages();
     }
-  };
-
-  const handleExit = () => {
-    setIsExiting(true);
-    setTimeout(() => {
-      onNavigateBack();
-    }, 500);
-  };
-
-  const handleReadMore = (e: MouseEvent, url: string) => {
-    e.stopPropagation();
-    window.open(url, '_blank');
   };
 
   return (
@@ -97,25 +91,18 @@ export default function NewsGatherer({ onNavigateBack, shouldLoad: initialShould
       class={`fixed inset-0 bg-gray-900 overflow-y-auto transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'}`} 
       onClick={handleExit}
     >
-      <div class="min-h-screen p-4 flex flex-col items-center">
-        <h1 class="text-3xl font-bold mb-6 text-white">Latest AI News</h1>
-        {console.log("Current news state:", news)}
-        {news.length === 0 ? (
-          <p class="text-white">Loading news...</p>
-        ) : (
-          news.map((item, index) => (
-            <div key={index} class="w-full max-w-2xl bg-gray-800 rounded-lg p-4 mb-4 text-white">
-              <h2 class="text-xl font-semibold mb-2">{item.title}</h2>
-              <p class="mb-2">{item.description}</p>
-              <button
-                onClick={(e) => handleReadMore(e, item.url)}
-                class="text-blue-400 hover:underline"
-              >
-                Read more
-              </button>
+      <div class="min-h-screen p-4">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {images.map((image) => (
+            <div key={image.key} class={`aspect-square ${image.animation}`}>
+              <img
+                src={image.src}
+                alt={image.alt}
+                class="w-full h-full object-cover rounded-lg shadow-md"
+              />
             </div>
-          ))
-        )}
+          ))}
+        </div>
         <div ref={loader} class="w-full h-10" />
       </div>
     </div>
