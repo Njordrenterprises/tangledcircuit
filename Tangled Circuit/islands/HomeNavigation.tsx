@@ -1,9 +1,9 @@
 import { useState } from "preact/hooks";
 
-const NavigationSquare = ({ index }: { index: number }) => {
+const NavigationSquare = ({ index, onClick }: { index: number; onClick: () => void }) => {
   const [isClicked, setIsClicked] = useState(false);
 
-  const baseClasses = "w-48 h-48 m-4 cursor-pointer transition-all duration-300 ease-in-out";
+  const baseClasses = "w-full h-full cursor-pointer transition-all duration-300 ease-in-out";
   const hoverClasses = "hover:brightness-115";
   
   const uniqueClasses = [
@@ -22,7 +22,10 @@ const NavigationSquare = ({ index }: { index: number }) => {
 
   const handleClick = () => {
     setIsClicked(true);
-    setTimeout(() => setIsClicked(false), 500);
+    setTimeout(() => {
+      setIsClicked(false);
+      onClick();
+    }, 400); // Reduced from 500ms to 450ms
   };
 
   return (
@@ -38,11 +41,11 @@ const NavigationSquare = ({ index }: { index: number }) => {
   );
 };
 
-export default function HomeNavigation() {
+export default function HomeNavigation({ onNavigate }: { onNavigate: (index: number) => void }) {
   return (
-    <div className="flex flex-wrap justify-center items-center min-h-screen bg-gray-900">
+    <div className="grid grid-cols-2 gap-4 p-4 h-screen w-screen bg-gray-900">
       {[0, 1, 2, 3].map((index) => (
-        <NavigationSquare key={index} index={index} />
+        <NavigationSquare key={index} index={index} onClick={() => onNavigate(index)} />
       ))}
     </div>
   );

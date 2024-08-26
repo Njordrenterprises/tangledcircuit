@@ -1,24 +1,55 @@
 import { useState, useEffect } from "preact/hooks";
 import AccessSystem from "../islands/AccessSystem.tsx";
 import HomeNavigation from "../islands/HomeNavigation.tsx";
+import ImageGallery from "../islands/ImageGallery.tsx";
+
+type View = 'access' | 'home' | 'gallery';
 
 export default function WelcomeIsland() {
-  const [isUnlocking, setIsUnlocking] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [currentView, setCurrentView] = useState<View>('access');
+  const [previousView, setPreviousView] = useState<View | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [galleryKey, setGalleryKey] = useState(0);
 
-  useEffect(() => {
-    if (isUnlocking) {
-      setTimeout(() => setIsUnlocked(true), 1000);
+  const transitionTo = (newView: View) => {
+    setPreviousView(currentView);
+    setIsTransitioning(true);
+    setCurrentView(newView);
+    if (newView === 'gallery') {
+      setGalleryKey(prevKey => prevKey + 1);
     }
-  }, [isUnlocking]);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setIsTransitioning(false);
+      });
+    });
+  };
+
+  const handleUnlock = () => {
+    transitionTo('home');
+  };
+
+  const handleNavigation = (index: number) => {
+    if (index === 0) {
+      transitionTo('gallery');
+    }
+    // Add more conditions for other squares as needed
+  };
+
+  const handleNavigateBack = () => {
+    transitionTo('home');
+  };
 
   return (
     <div class="w-screen h-screen flex justify-center items-center bg-gray-900">
-      <div class={`absolute inset-0 transition-opacity duration-1000 ${isUnlocking ? 'opacity-0' : 'opacity-100'}`}>
-        <AccessSystem onUnlock={() => setIsUnlocking(true)} />
+      <div class={`absolute inset-0 transition-opacity duration-1000 ${currentView === 'access' || previousView === 'access' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <AccessSystem onUnlock={handleUnlock} />
       </div>
-      <div class={`absolute inset-0 transition-opacity duration-1000 ${isUnlocked ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <HomeNavigation />
+      <div class={`absolute inset-0 transition-opacity duration-1000 ${currentView === 'home' || previousView === 'home' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <HomeNavigation onNavigate={handleNavigation} />
+      </div>
+      <div class={`absolute inset-0 transition-opacity duration-1000 ${currentView === 'gallery' || previousView === 'gallery' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <ImageGallery key={galleryKey} onNavigateBack={handleNavigateBack} />
       </div>
     </div>
   );

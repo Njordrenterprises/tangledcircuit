@@ -11,6 +11,7 @@ import * as $index from './routes/index.tsx';
 import * as $AccessSystem from './islands/AccessSystem.tsx';
 import * as $Counter from './islands/Counter.tsx';
 import * as $HomeNavigation from './islands/HomeNavigation.tsx';
+import * as $ImageGallery from './islands/ImageGallery.tsx';
 import * as $WelcomeIsland from './islands/WelcomeIsland.tsx';
 import { type Manifest } from '$fresh/server.ts';
 
@@ -27,6 +28,7 @@ const manifest = {
     './islands/AccessSystem.tsx': $AccessSystem,
     './islands/Counter.tsx': $Counter,
     './islands/HomeNavigation.tsx': $HomeNavigation,
+    './islands/ImageGallery.tsx': $ImageGallery,
     './islands/WelcomeIsland.tsx': $WelcomeIsland,
   },
   baseUrl: import.meta.url,

@@ -44,8 +44,8 @@ export default function AccessSystem({ onUnlock }: { onUnlock: () => void }) {
   }, [activeButtons]);
 
   return (
-    <section class="relative h-screen w-screen overflow-hidden bg-gray-900 text-green-500 font-mono flex flex-col items-center justify-center">
-      <h1 class="text-6xl font-bold mb-8 animate-pulse">{message}</h1>
+    <section class="relative h-screen w-screen overflow-hidden bg-gray-900 text-green-500 font-mono flex flex-col items-center justify-center px-4">
+      <h1 class="text-4xl sm:text-6xl font-bold mb-8 animate-pulse text-center">{message}</h1>
       
       <div class="flex space-x-4 mb-8">
         <AccessButton id={1} isActive={activeButtons.includes(1)} onClick={handleButtonClick} />
@@ -53,17 +53,17 @@ export default function AccessSystem({ onUnlock }: { onUnlock: () => void }) {
         <AccessButton id={3} isActive={activeButtons.includes(3)} onClick={handleButtonClick} />
       </div>
       
-      <div class={`w-32 h-32 rounded-full flex items-center justify-center text-6xl ${
+      <div class={`w-24 h-24 sm:w-32 sm:h-32 rounded-full flex items-center justify-center text-4xl sm:text-6xl ${
         isUnlocked ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
       }`}>
         {isUnlocked ? '🔓' : '🔒'}
       </div>
       
-      <p class="mt-8 text-xl animate-bounce">
+      <p class="mt-8 text-lg sm:text-xl animate-bounce text-center">
         {isUnlocked ? 'System Unlocked' : 'Enter the correct sequence'}
       </p>
 
-      <div class="absolute bottom-4 left-4 flex items-center text-yellow-500">
+      <div class="absolute bottom-4 left-4 flex items-center text-yellow-500 text-sm sm:text-base">
         <span class="mr-2">⚠️</span>
         <span>Warning: Unauthorized access attempt detected</span>
       </div>
