@@ -14,6 +14,7 @@ import * as $Counter from './islands/Counter.tsx';
 import * as $HomeNavigation from './islands/HomeNavigation.tsx';
 import * as $ImageGallery from './islands/ImageGallery.tsx';
 import * as $NewsGatherer from './islands/NewsGatherer.tsx';
+import * as $NewsReader from './islands/NewsReader.tsx';
 import * as $WelcomeIsland from './islands/WelcomeIsland.tsx';
 import { type Manifest } from '$fresh/server.ts';
 
@@ -33,6 +34,7 @@ const manifest = {
     './islands/HomeNavigation.tsx': $HomeNavigation,
     './islands/ImageGallery.tsx': $ImageGallery,
     './islands/NewsGatherer.tsx': $NewsGatherer,
+    './islands/NewsReader.tsx': $NewsReader,
     './islands/WelcomeIsland.tsx': $WelcomeIsland,
   },
   baseUrl: import.meta.url,

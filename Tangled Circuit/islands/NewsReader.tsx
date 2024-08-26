@@ -100,7 +100,7 @@ export default function NewsGatherer({ onNavigateBack, shouldLoad: initialShould
     >
       <div class="min-h-screen p-4 flex flex-col items-center">
         <h1 class="text-3xl font-bold mb-6 text-white">Latest AI News</h1>
-        {console.log("Current news state:", news)} {/* Add this line */}
+        {console.log("Current news state:", news)}
         {news.length === 0 ? (
           <p class="text-white">Loading news...</p>
         ) : (

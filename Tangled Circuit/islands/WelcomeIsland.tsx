@@ -49,7 +49,7 @@ export default function WelcomeIsland() {
         <ImageGallery key={galleryKey} onNavigateBack={handleNavigateBack} shouldLoad={currentView === 'gallery'} />
       </div>
       <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'news' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <NewsGatherer key={newsKey} onNavigateBack={handleNavigateBack} />
+        <NewsGatherer key={newsKey} onNavigateBack={handleNavigateBack} shouldLoad={currentView === 'news'} />
       </div>
     </div>
   );
