@@ -9,3 +9,6 @@
 _fresh/
 # npm dependencies
 node_modules/
+
+# Add this line to ignore all .env files
+*.env

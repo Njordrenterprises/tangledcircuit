@@ -3,6 +3,7 @@ import AccessSystem from "../islands/AccessSystem.tsx";
 import HomeNavigation from "../islands/HomeNavigation.tsx";
 import ImageGallery from "../islands/ImageGallery.tsx";
 import NewsGatherer from "../islands/NewsGatherer.tsx";
+import Header from "../components/Header.tsx";
 
 type View = 'access' | 'home' | 'gallery' | 'news';
 
@@ -42,18 +43,21 @@ export default function WelcomeIsland() {
   };
 
   return (
-    <div class="w-screen h-screen bg-gray-900 relative overflow-hidden">
-      <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'access' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <AccessSystem onUnlock={handleUnlock} />
-      </div>
-      <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'home' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <HomeNavigation onNavigate={handleNavigation} />
-      </div>
-      <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'gallery' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <ImageGallery key={galleryKey} onNavigateBack={handleNavigateBack} shouldLoad={currentView === 'gallery'} />
-      </div>
-      <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'news' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <NewsGatherer key={newsKey} onNavigateBack={handleNavigateBack} shouldLoad={currentView === 'news'} />
+    <div class="w-screen h-screen bg-gray-900 relative overflow-hidden flex flex-col">
+      <Header />
+      <div class="flex-grow relative">
+        <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'access' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <AccessSystem onUnlock={handleUnlock} />
+        </div>
+        <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'home' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <HomeNavigation onNavigate={handleNavigation} />
+        </div>
+        <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'gallery' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <ImageGallery key={galleryKey} onNavigateBack={handleNavigateBack} shouldLoad={currentView === 'gallery'} />
+        </div>
+        <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'news' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <NewsGatherer key={newsKey} onNavigateBack={handleNavigateBack} shouldLoad={currentView === 'news'} />
+        </div>
       </div>
     </div>
   );

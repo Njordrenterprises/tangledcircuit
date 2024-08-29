@@ -20,7 +20,14 @@ export const handler: Handlers = {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return new Response(JSON.stringify(data), {
+      const totalResults = data.totalResults;
+      const hasMore = totalResults > ITEMS_PER_PAGE * parseInt(page);
+
+      return new Response(JSON.stringify({
+        articles: data.articles,
+        totalResults,
+        hasMore
+      }), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (error) {
