@@ -1,5 +1,12 @@
 import { useState } from "preact/hooks";
 
+const growShrinkAnimations = [
+  'animate-grow-shrink-1',
+  'animate-grow-shrink-2',
+  'animate-grow-shrink-3',
+  'animate-grow-shrink-4',
+];
+
 const NavigationSquare = ({ index, onClick }: { index: number; onClick: () => void }) => {
   const [isClicked, setIsClicked] = useState(false);
 
@@ -13,19 +20,14 @@ const NavigationSquare = ({ index, onClick }: { index: number; onClick: () => vo
     "bg-gradient-to-bl from-yellow-500 to-green-500 border-4 border-yellow-700 rounded-none"
   ][index];
 
-  const animationClasses = [
-    "animate-slight-wiggle",
-    "animate-gentle-float",
-    "animate-subtle-pulse",
-    "animate-perspective-shift"
-  ][index];
+  const animationClasses = `${growShrinkAnimations[index]} animate-gentle-wind-${index + 1} transform-gpu`;
 
   const handleClick = () => {
     setIsClicked(true);
     setTimeout(() => {
       setIsClicked(false);
       onClick();
-    }, 400); // Reduced from 500ms to 450ms
+    }, 400);
   };
 
   return (

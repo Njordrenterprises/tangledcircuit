@@ -7,12 +7,7 @@ interface Image {
   animation: string;
 }
 
-const animations = [
-  'animate-wiggle',
-  'animate-float',
-  'animate-pulse-slow',
-  'animate-spin-slow',
-];
+const animations = ['animate-gentle-wind-1', 'animate-gentle-wind-2', 'animate-gentle-wind-3', 'animate-gentle-wind-4'];
 
 const IMAGES_PER_PAGE = 6;
 

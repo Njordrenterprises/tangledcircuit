@@ -25,7 +25,16 @@ export default function WelcomeIsland() {
   };
 
   const handleNavigation = (index: number) => {
-    transitionTo('gallery');
+    switch (index) {
+      case 0:
+        transitionTo('gallery');
+        break;
+      case 1:
+        transitionTo('news');
+        break;
+      default:
+        console.log(`Navigation option ${index} not implemented yet`);
+    }
   };
 
   const handleNavigateBack = () => {

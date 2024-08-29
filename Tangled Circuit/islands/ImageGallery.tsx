@@ -7,48 +7,51 @@ interface Image {
   animation: string;
 }
 
-const animations = [
-  'animate-wiggle',
-  'animate-float',
-  'animate-pulse-slow',
-  'animate-spin-slow',
-];
+const animations = ['animate-gentle-wind-1', 'animate-gentle-wind-2', 'animate-gentle-wind-3', 'animate-gentle-wind-4'];
 
-const IMAGES_PER_PAGE = 6;
+const IMAGES_PER_PAGE = 10;
 
 export default function ImageGallery({ onNavigateBack, shouldLoad: initialShouldLoad }: { onNavigateBack: () => void, shouldLoad: boolean }) {
   const [images, setImages] = useState<Image[]>([]);
-  const loader = useRef(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [shouldLoad, setShouldLoad] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const loadMoreImages = async () => {
+    if (!hasMore || isLoading) return;
+
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/images');
+      const response = await fetch(`/api/images?page=${page}&limit=${IMAGES_PER_PAGE}`);
       if (!response.ok) {
         throw new Error('Failed to fetch images');
       }
-      const imageNames: string[] = await response.json();
-      const newImages = Array.from({ length: IMAGES_PER_PAGE }, () => {
-        const randomIndex = Math.floor(Math.random() * imageNames.length);
-        const timestamp = Date.now();
-        const randomNum = Math.floor(Math.random() * 1000);
-        const key = `${timestamp}-${randomNum}`;
-        return {
-          key,
-          src: `/images/${imageNames[randomIndex]}`,
-          alt: `Tech image ${imageNames[randomIndex].split('.')[0]}`,
-          animation: animations[Math.floor(Math.random() * animations.length)],
-        };
-      });
-      setImages((prevImages) => {
-        const uniqueNewImages = newImages.filter(newImg => 
-          !prevImages.some(prevImg => prevImg.key === newImg.key)
-        );
-        return [...prevImages, ...uniqueNewImages];
-      });
+      const data = await response.json();
+      const newImages = data.images.map((imageName: string) => ({
+        key: `${Date.now()}-${Math.random()}`,
+        src: `/images/${imageName}`,
+        alt: `Tech image ${imageName.split('.')[0]}`,
+        animation: animations[Math.floor(Math.random() * animations.length)],
+      }));
+      setImages((prevImages) => [...prevImages, ...newImages]);
+      setPage((prevPage) => prevPage + 1);
+      setHasMore(data.hasMore);
     } catch (error) {
       console.error('Error loading images:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleScroll = () => {
+    if (containerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+      if (scrollHeight - scrollTop <= clientHeight * 1.5) {
+        loadMoreImages();
+      }
     }
   };
 
@@ -60,16 +63,6 @@ export default function ImageGallery({ onNavigateBack, shouldLoad: initialShould
   };
 
   useEffect(() => {
-    if (shouldLoad) {
-      const observer = new IntersectionObserver(handleObserver, { threshold: 1 });
-      if (loader.current) {
-        observer.observe(loader.current);
-      }
-      return () => observer.disconnect();
-    }
-  }, [shouldLoad]);
-
-  useEffect(() => {
     if (shouldLoad && images.length === 0) {
       loadMoreImages();
     }
@@ -79,22 +72,28 @@ export default function ImageGallery({ onNavigateBack, shouldLoad: initialShould
     setShouldLoad(initialShouldLoad);
   }, [initialShouldLoad]);
 
-  const handleObserver = async (entities: IntersectionObserverEntry[]) => {
-    const target = entities[0];
-    if (target.isIntersecting) {
-      await loadMoreImages();
+  useEffect(() => {
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      currentContainer.addEventListener('scroll', handleScroll);
     }
-  };
+    return () => {
+      if (currentContainer) {
+        currentContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
 
   return (
     <div 
+      ref={containerRef}
       class={`fixed inset-0 bg-gray-900 overflow-y-auto transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'}`} 
       onClick={handleExit}
     >
       <div class="min-h-screen p-4">
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((image) => (
-            <div key={image.key} class={`aspect-square ${image.animation}`}>
+            <div key={image.key} class={`aspect-square ${image.animation} transform-gpu`}>
               <img
                 src={image.src}
                 alt={image.alt}
@@ -103,7 +102,7 @@ export default function ImageGallery({ onNavigateBack, shouldLoad: initialShould
             </div>
           ))}
         </div>
-        <div ref={loader} class="w-full h-10" />
+        {isLoading && <div class="w-full h-10 mt-4 text-center">Loading...</div>}
       </div>
     </div>
   );
