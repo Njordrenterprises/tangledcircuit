@@ -1,3 +1,68 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.markdown-content {
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
+  max-width: 100%;
+}
+
+.markdown-content h1, .markdown-content h2, .markdown-content h3,
+.markdown-content h4, .markdown-content h5, .markdown-content h6 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+  width: 100%;
+}
+
+.markdown-content p {
+  margin-bottom: 1em;
+  width: 100%;
+}
+
+.markdown-content ul, .markdown-content ol {
+  margin-bottom: 1em;
+  padding-left: 2em;
+  width: 100%;
+}
+
+.markdown-content code {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.markdown-content pre {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 1em;
+  border-radius: 5px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  width: 100%;
+}
+
+.hacker-input {
+  border: 2px solid #00ff00;
+  box-shadow: 0 0 10px #00ff00;
+  color: #00ff00;
+  background-color: rgba(0, 255, 0, 0.1);
+}
+
+.hacker-input::placeholder {
+  color: rgba(0, 255, 0, 0.5);
+}
+
+.hacker-input:focus {
+  outline: none;
+  box-shadow: 0 0 15px #00ff00;
+}

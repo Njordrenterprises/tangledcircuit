@@ -2,22 +2,22 @@ import { useState } from "preact/hooks";
 import AccessSystem from "../islands/AccessSystem.tsx";
 import HomeNavigation from "../islands/HomeNavigation.tsx";
 import ImageGallery from "../islands/ImageGallery.tsx";
-import NewsGatherer from "../islands/NewsGatherer.tsx";
+import AIChat from "./AIchat.tsx";
 import Header from "../components/Header.tsx";
 
-type View = 'access' | 'home' | 'gallery' | 'news';
+type View = 'access' | 'home' | 'gallery' | 'chat';
 
 export default function WelcomeIsland() {
   const [currentView, setCurrentView] = useState<View>('access');
   const [galleryKey, setGalleryKey] = useState(0);
-  const [newsKey, setNewsKey] = useState(0);
+  const [chatKey, setChatKey] = useState(0);
 
   const transitionTo = (newView: View) => {
     setCurrentView(newView);
     if (newView === 'gallery') {
       setGalleryKey(prevKey => prevKey + 1);
-    } else if (newView === 'news') {
-      setNewsKey(prevKey => prevKey + 1);
+    } else if (newView === 'chat') {
+      setChatKey(prevKey => prevKey + 1);
     }
   };
 
@@ -31,7 +31,7 @@ export default function WelcomeIsland() {
         transitionTo('gallery');
         break;
       case 1:
-        transitionTo('news');
+        transitionTo('chat');
         break;
       default:
         console.log(`Navigation option ${index} not implemented yet`);
@@ -55,8 +55,8 @@ export default function WelcomeIsland() {
         <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'gallery' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <ImageGallery key={galleryKey} onNavigateBack={handleNavigateBack} shouldLoad={currentView === 'gallery'} />
         </div>
-        <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'news' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-          <NewsGatherer key={newsKey} onNavigateBack={handleNavigateBack} shouldLoad={currentView === 'news'} />
+        <div class={`absolute inset-0 transition-opacity duration-500 ${currentView === 'chat' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <AIChat key={chatKey} onNavigateBack={handleNavigateBack} />
         </div>
       </div>
     </div>
