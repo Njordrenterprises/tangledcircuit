@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "preact/hooks";
-import Header from "../components/Header.tsx";
 import { marked } from "marked";
 import clipboardCopy from "clipboard-copy";
 
@@ -92,7 +91,7 @@ export default function AIChat({ onNavigateBack }: { onNavigateBack: () => void 
 
   return (
     <div class={`fixed inset-0 bg-gray-900 overflow-hidden transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'} flex flex-col`}>
-      <div class="p-4 flex flex-col items-center border-b border-green-500">
+      <div class="sticky top-0 z-10 p-4 flex flex-col items-center border-b border-green-500 bg-gray-900">
         <button
           onClick={handleExit}
           class="text-red-500 hover:text-red-300"
@@ -127,7 +126,7 @@ export default function AIChat({ onNavigateBack }: { onNavigateBack: () => void 
           {error && <div class="text-red-500 text-center">{error}</div>}
         </div>
       </div>
-      <div class="p-4 border-t border-green-500">
+      <div class="sticky bottom-0 p-4 border-t border-green-500 bg-gray-900">
         <div class="flex justify-center">
           <div class="max-w-[120ch] w-full flex">
             <input

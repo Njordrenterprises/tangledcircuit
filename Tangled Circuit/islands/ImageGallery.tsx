@@ -87,9 +87,16 @@ export default function ImageGallery({ onNavigateBack, shouldLoad: initialShould
   return (
     <div 
       ref={containerRef}
-      class={`fixed inset-0 bg-gray-900 overflow-y-auto transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'}`} 
-      onClick={handleExit}
+      class={`fixed inset-0 bg-gray-900 overflow-y-auto transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'}`}
     >
+      <div class="sticky top-0 z-10 p-4 flex flex-col items-center border-b border-green-500 bg-gray-900">
+        <button
+          onClick={handleExit}
+          class="text-red-500 hover:text-red-300"
+        >
+          Exit
+        </button>
+      </div>
       <div class="min-h-screen p-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((image) => (
