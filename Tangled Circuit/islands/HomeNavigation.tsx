@@ -1,26 +1,14 @@
 import { useState } from "preact/hooks";
 
-const growShrinkAnimations = [
-  'animate-grow-shrink-1',
-  'animate-grow-shrink-2',
-  'animate-grow-shrink-3',
-  'animate-grow-shrink-4',
-];
-
-const NavigationSquare = ({ index, onClick }: { index: number; onClick: () => void }) => {
+const NavigationButton = ({ index, onClick, label }: { index: number; onClick: () => void; label: string }) => {
   const [isClicked, setIsClicked] = useState(false);
 
-  const baseClasses = "w-full h-full cursor-pointer transition-all duration-300 ease-in-out";
-  const hoverClasses = "hover:brightness-115";
+  const baseClasses = "w-full h-full cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center";
+  const hoverClasses = "hover:brightness-115 hover:shadow-[0_0_20px_#00ff00]";
   
-  const uniqueClasses = [
-    "bg-gradient-to-br from-red-500 to-yellow-500 border-4 border-red-700 rounded-lg",
-    "bg-gradient-to-tl from-blue-500 to-green-500 border-4 border-blue-700 rounded-full",
-    "bg-gradient-to-tr from-purple-500 to-pink-500 border-4 border-purple-700 rounded-3xl",
-    "bg-gradient-to-bl from-yellow-500 to-green-500 border-4 border-yellow-700 rounded-none"
-  ][index];
-
-  const animationClasses = `${growShrinkAnimations[index]} animate-gentle-wind-${index + 1} transform-gpu`;
+  const shapeClasses = index === 0
+    ? "rounded-lg"
+    : "rounded-full";
 
   const handleClick = () => {
     setIsClicked(true);
@@ -35,20 +23,32 @@ const NavigationSquare = ({ index, onClick }: { index: number; onClick: () => vo
       className={`
         ${baseClasses}
         ${hoverClasses}
-        ${uniqueClasses}
-        ${isClicked ? 'animate-shrink-spiral' : animationClasses}
+        ${shapeClasses}
+        bg-gradient-to-br from-green-900 to-green-700 border-4 border-green-500
+        ${isClicked ? 'animate-shrink-spiral' : `animate-grow-shrink-${index + 1} animate-gentle-wind-${index + 1}`}
       `}
       onClick={handleClick}
-    />
+    >
+      <span className="text-green-300 font-mono text-2xl sm:text-3xl font-bold">
+        {label}
+      </span>
+    </div>
   );
 };
 
 export default function HomeNavigation({ onNavigate }: { onNavigate: (index: number) => void }) {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <div className="grid grid-cols-2 gap-4 p-4 h-screen w-screen bg-gray-900">
-      {[0, 1, 2, 3].map((index) => (
-        <NavigationSquare key={index} index={index} onClick={() => onNavigate(index)} />
-      ))}
+    <div className="flex flex-col items-center justify-between h-full bg-gray-900 p-4">
+      <div className="flex-grow flex flex-col items-center justify-center w-full max-w-md space-y-8 my-8">
+        <div className="w-full aspect-square max-h-[40vh]">
+          <NavigationButton index={0} onClick={() => onNavigate(1)} label="DENO CHAT" />
+        </div>
+        <div className="w-4/5 aspect-square max-h-[35vh]">
+          <NavigationButton index={1} onClick={() => onNavigate(0)} label="DAS ART" />
+        </div>
+      </div>
     </div>
   );
 }

@@ -30,16 +30,44 @@ export default function AIChat({ onNavigateBack }: { onNavigateBack: () => void 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: inputMessage })
       });
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch AI response');
+        throw new Error('Failed to fetch AI response');
       }
-      const data = await response.json();
-      const aiReply: ChatMessage = { role: "assistant", content: data.reply };
+
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let aiReply: ChatMessage = { role: "assistant", content: "" };
       setMessages(prevMessages => [...prevMessages, aiReply]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') break;
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices[0].delta.content;
+              if (content) {
+                aiReply = { ...aiReply, content: aiReply.content + content };
+                setMessages(prevMessages => [
+                  ...prevMessages.slice(0, -1),
+                  aiReply
+                ]);
+              }
+            } catch (e) {
+              console.error('Error parsing JSON:', e);
+            }
+          }
+        }
+      }
     } catch (error) {
       console.error('Error fetching AI response:', error);
-      setError(error.message || 'An error occurred while fetching the AI response');
+      setError((error as Error).message || 'An error occurred while fetching the AI response');
     } finally {
       setIsLoading(false);
     }
@@ -63,48 +91,52 @@ export default function AIChat({ onNavigateBack }: { onNavigateBack: () => void 
   };
 
   return (
-    <div class={`fixed inset-0 bg-gray-900 overflow-hidden transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'}`}>
-      <Header>
+    <div class={`fixed inset-0 bg-gray-900 overflow-hidden transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'} flex flex-col`}>
+      <div class="p-4 flex flex-col items-center border-b border-green-500">
         <button
           onClick={handleExit}
           class="text-red-500 hover:text-red-300"
         >
           Exit
         </button>
-      </Header>
-      <div class="flex flex-col h-[calc(100vh-96px)]">
-        <div ref={chatContainerRef} class="flex-grow p-2 overflow-y-auto">
+      </div>
+      <div class="flex-grow overflow-y-auto">
+        <div ref={chatContainerRef} class="p-2">
           {messages.map((msg, index) => (
             <div key={index} class="mb-4 flex justify-center">
-              <div class={`p-4 rounded-lg border-2 border-green-500 bg-gray-900 text-green-300 w-full relative shadow-[0_0_10px_#00ff00]`}>
-                <div class="flex justify-between items-center mb-2">
-                  <span class="font-bold">{msg.role === "user" ? "You" : "AI"}</span>
+              <div class="max-w-[120ch] w-full">
+                <div class={`p-4 rounded-lg border-2 border-green-500 bg-gray-900 text-green-300 relative shadow-[0_0_10px_#00ff00]`}>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="font-bold">{msg.role === "user" ? "You" : "Deno"}</span>
+                  </div>
+                  <div
+                    dangerouslySetInnerHTML={{ __html: marked(msg.content) }}
+                    class="markdown-content text-sm break-words whitespace-pre-wrap"
+                  />
+                  <button
+                    onClick={() => copyMessage(msg.content)}
+                    class="absolute bottom-2 right-2 text-xs bg-green-700 hover:bg-green-600 text-green-300 p-1 rounded"
+                  >
+                    📋
+                  </button>
                 </div>
-                <div
-                  dangerouslySetInnerHTML={{ __html: marked(msg.content) }}
-                  class="markdown-content text-sm break-words whitespace-pre-wrap"
-                />
-                <button
-                  onClick={() => copyMessage(msg.content)}
-                  class="absolute bottom-2 right-2 text-xs bg-green-700 hover:bg-green-600 text-green-300 p-1 rounded"
-                >
-                  📋
-                </button>
               </div>
             </div>
           ))}
-          {isLoading && <div class="text-green-500 text-center">AI is thinking...</div>}
+          {isLoading && <div class="text-green-500 text-center">Deno is thinking...</div>}
           {error && <div class="text-red-500 text-center">{error}</div>}
         </div>
-        <div class="p-4 border-t border-green-500 mb-4">
-          <div class="flex justify-center">
+      </div>
+      <div class="p-4 border-t border-green-500">
+        <div class="flex justify-center">
+          <div class="max-w-[120ch] w-full flex">
             <input
               type="text"
               value={inputMessage}
               onInput={(e) => setInputMessage(e.currentTarget.value)}
               onKeyPress={(e) => e.key === "Enter" && sendMessage()}
               placeholder="Type your message..."
-              class="w-11/12 p-2 rounded-l-lg focus:outline-none hacker-input"
+              class="flex-grow p-2 rounded-l-lg focus:outline-none hacker-input"
             />
             <button
               onClick={sendMessage}

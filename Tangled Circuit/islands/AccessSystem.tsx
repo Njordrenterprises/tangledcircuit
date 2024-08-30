@@ -44,7 +44,7 @@ export default function AccessSystem({ onUnlock }: { onUnlock: () => void }) {
   }, [activeButtons]);
 
   return (
-    <section class="relative h-screen w-screen overflow-hidden bg-gray-900 text-green-500 font-mono flex flex-col items-center justify-center px-4">
+    <section class="relative h-full w-full overflow-hidden bg-gray-900 text-green-500 font-mono flex flex-col items-center justify-center px-4">
       <h1 class="text-4xl sm:text-6xl font-bold mb-8 animate-pulse text-center">{message}</h1>
       
       <div class="flex space-x-4 mb-8">

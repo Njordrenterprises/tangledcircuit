@@ -35,7 +35,8 @@ export const handler: Handlers = {
         },
         body: JSON.stringify({
           model: "llama-3.1-70b-instruct",
-          messages: messages
+          messages: messages,
+          stream: true
         })
       });
 
@@ -45,13 +46,8 @@ export const handler: Handlers = {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log("AI response:", data);
-
-      return new Response(JSON.stringify({
-        reply: data.choices[0].message.content
-      }), {
-        headers: { "Content-Type": "application/json" },
+      return new Response(response.body, {
+        headers: { "Content-Type": "text/event-stream" }
       });
     } catch (error) {
       console.error('Error fetching AI response:', error);
